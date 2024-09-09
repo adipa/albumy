@@ -18,7 +18,7 @@ from albumy.forms.main import DescriptionForm, TagForm, CommentForm
 from albumy.models import User, Photo, Tag, Follow, Collect, Comment, Notification
 from albumy.notifications import push_comment_notification, push_collect_notification
 from albumy.utils import rename_image, resize_image, redirect_back, flash_errors
-
+from albumy.ml_compute_vision import generate_image_caption, generate_image_tags
 main_bp = Blueprint('main', __name__)
 
 
@@ -113,6 +113,7 @@ def get_image(filename):
 def get_avatar(filename):
     return send_from_directory(current_app.config['AVATARS_SAVE_PATH'], filename)
 
+# def fn to get image caption from CV API
 
 @main_bp.route('/upload', methods=['GET', 'POST'])
 @login_required
@@ -125,16 +126,34 @@ def upload():
         f.save(os.path.join(current_app.config['ALBUMY_UPLOAD_PATH'], filename))
         filename_s = resize_image(f, filename, current_app.config['ALBUMY_PHOTO_SIZE']['small'])
         filename_m = resize_image(f, filename, current_app.config['ALBUMY_PHOTO_SIZE']['medium'])
+        # get image alt text
+        image_desc = generate_image_caption("uploads/%s" %(filename))
+        # print(image_desc)
         photo = Photo(
             filename=filename,
             filename_s=filename_s,
             filename_m=filename_m,
-            author=current_user._get_current_object()
+            author=current_user._get_current_object(),
+            # add description here
+            description=image_desc
         )
         db.session.add(photo)
         db.session.commit()
+
+        tags = generate_image_tags("uploads/%s" %(filename))  # Function to create tags
+        add_tags_to_photo(tags, photo)
+        db.session.commit()
     return render_template('main/upload.html')
 
+# function to add tags to photo
+def add_tags_to_photo(tags, photo):
+    for name in tags:
+        tag = Tag.query.filter_by(name=name).first()
+        if tag is None:
+            tag = Tag(name=name)
+            db.session.add(tag)
+        if tag not in photo.tags:
+            photo.tags.append(tag)
 
 @main_bp.route('/photo/<int:photo_id>')
 def show_photo(photo_id):
