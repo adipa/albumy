@@ -38,6 +38,15 @@ Test account:
 * email: `admin@helloflask.com`
 * password: `helloflask`
 
+## Azure Setup
+
+### Connecting to the Azure Vision API
+1. Sign up for the a student account for Microsoft Azure: https://azure.microsoft.com/en-us/free/students/ – no credit card required
+2. Create an instance of the Computer Vision service and get an API endpoint of your instance of the service.
+3. Get a subscription key to authorize your script to call the Computer Vision API.
+4. Update the code with the endpoint and key and test it. Here I have used a creds.json file that has the endpoint and the key. (file not committed for obvious reasons :) )
+
+
 ## License
 
 This project is licensed under the MIT License (see the
