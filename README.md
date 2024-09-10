@@ -10,9 +10,9 @@ Demo: http://albumy.helloflask.com
 
 ## Installation
 
-clone:
+To be able to push updates fork the repo: [https://github.com/greyli/albumy.git](https://github.com/greyli/albumy.git). Clone the repo after forking.
 ```
-$ git clone https://github.com/greyli/albumy.git
+$ git clone https://github.com/adipa/albumy.git 
 $ cd albumy
 ```
 create & activate virtual env then install dependency:
